@@ -1,0 +1,3 @@
+/home/shalasheg/VsCodeProjects/ComputationPracticum/HW2/buils/CMakeFiles/COMPUTATION_HW2.dir
+/home/shalasheg/VsCodeProjects/ComputationPracticum/HW2/buils/CMakeFiles/edit_cache.dir
+/home/shalasheg/VsCodeProjects/ComputationPracticum/HW2/buils/CMakeFiles/rebuild_cache.dir
