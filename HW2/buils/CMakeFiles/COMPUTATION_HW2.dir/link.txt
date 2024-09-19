@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/COMPUTATION_HW2.dir/main.cpp.o -o COMPUTATION_HW2 
