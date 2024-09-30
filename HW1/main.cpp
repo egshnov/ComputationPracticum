@@ -29,11 +29,11 @@ std::vector<segment> root_separation(long double A, long double B, int N)
     long double x2 = x1 + h;
     long double y1 = function(x1);
     std::vector<segment> res;
-    while (x2 < B || std::fabs(B - x2) < cmp_eps) // TODO: normal float comarsion
+    while (x2 < B || std::fabs(B - x2) < cmp_eps)
     {
         long double y2 = function(x2);
-        if (y2 * y1 <= 0)
-        { // TODO: normal float comparison
+        if (y2 * y1 <= 0) // TODO: normal float comparison
+        {
             res.push_back({x1, x2});
         }
         x1 = x2;
@@ -106,6 +106,9 @@ std::tuple<segment, int, long double> secant(const segment &inp, long double eps
     return {{x_k_1, x_k}, cnt, x_k};
 }
 
+//TODO: setpricision(100)
+//TODO: ошибка в секущих
+//TODO: запрос эпсилона
 int main()
 {
     std::cout << "Задание 1: Численные методы решения нелинейных уравнений" << std::endl;
@@ -116,12 +119,25 @@ int main()
     std::cout << "eps = " << eps << std::endl;
     std::cout << "Введите края отрезка [A,B]:" << std::endl;
     std::cin >> A >> B;
-    std::cout << "Введите значение N:" << std::endl;
-    std::cin >> N;
-    std::vector<segment> segments = root_separation(A, B, N);
+    bool end_input = false;
+    std::vector<segment> segments;
+    
+    while (!end_input)
+    {
+        std::cout << "Введите значение N:" << std::endl;
+        std::cin >> N;
+        segments = root_separation(A, B, N);
 
-    std::cout << "Число отрезков: " << segments.size() << std::endl;
-
+        std::cout << "Число отрезков: " << segments.size() << std::endl;
+        for (auto &i : segments)
+        {
+            std::cout << "[" << i.first << "," << i.second << "], ";
+        }
+        std::cout << std::endl;
+        std::cout << "Прекратить отделение?\n";
+        std::cin >> end_input;
+    }
+    
     auto helper = [](const segment &inp, long double eps, method_func *method)
     {
         auto [seg, cnt, x] = method(inp, eps);
