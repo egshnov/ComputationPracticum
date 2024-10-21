@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+
 long double function(long double x)
 {
     return std::log(1 + x) - std::exp(x);
@@ -31,27 +32,18 @@ int main()
     long double a, b, x;
     std::cout << "Задача 2: алгебраическое интерполирование\nВариант 13\nВведите число значений в таблице (m+1):" << std::endl;
     std::cin >> m;
-    std::cout << "Введите степень интерполяционного многочлена:\n";
-    std::cin >> n;
-    while (n > m - 1)
-    {
-        std::cout << "n не должно превосходить m!!!!\n Введите значение n повторно:";
-        std::cin >> n;
-    }
     std::cout << "Введите края отрезка:\n";
     std::cin >> a >> b;
-    std::cout << "Введите точку интерполирования:\n";
-    std::cin >> x;
 
     std::vector<std::pair<long double, long double>> interpol_table(m);
     // x_j возрастает, можно не сортировать.
-
     for (int j = 0; j < m; j++)
     {
 
         interpol_table[j].first = a + j * (b - a) / (m - 1);
         interpol_table[j].second = function(interpol_table[j].first);
     }
+    std::cout << std::endl;
     for (auto &i : interpol_table)
     {
         std::cout << i.first << " ";
@@ -63,9 +55,25 @@ int main()
         std::cout << i.second << " ";
     }
     std::cout << std::endl;
+    bool stop = false;
+    do
+    {
+        std::cout << "Введите степень интерполяционного многочлена:\n";
+        std::cin >> n;
+        while (n > m - 1)
+        {
+            std::cout << "n не должно превосходить m!!!!\n Введите значение n повторно:";
+            std::cin >> n;
+        }
+        std::cout << "Введите точку интерполирования:\n";
+        std::cin >> x;
 
-    long double approximate = lagrange_interpol(interpol_table, n, x);
-    std::cout << "Полученное значение:" << approximate << std::endl;
-    std::cout << "Ожидаемое значение:" << function(x) << std::endl;
-    std::cout << "Отклонение:" << std::fabs(function(x) - approximate) << std::endl;
+        long double approximate = lagrange_interpol(interpol_table, n, x);
+        std::cout << "Полученное значение: " << approximate << std::endl;
+        std::cout << "Ожидаемое значение: " << function(x) << std::endl;
+        std::cout << "Отклонение: " << std::fabs(function(x) - approximate) << std::endl;
+
+        std::cout << "Ввести новый значения x и n?\n";
+        std::cin >> stop;
+    } while (stop);
 }
