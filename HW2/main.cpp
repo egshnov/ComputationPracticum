@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 long double function(long double x)
 {
@@ -26,11 +27,12 @@ long double lagrange_interpol(const std::vector<std::pair<long double, long doub
     }
     return res;
 }
+
 int main()
 {
     int m, n; // m это m+1 в терминах методички
     long double a, b, x;
-    std::cout << "Задача 2: алгебраическое интерполирование\nВариант 13\nВведите число значений в таблице (m+1):" << std::endl;
+    std::cout << "Задача 2: алгебраическое интерполирование\nВариант 13\nфункция: log(1+x)-e^x\nВведите число значений в таблице (m+1):" << std::endl;
     std::cin >> m;
     std::cout << "Введите края отрезка:\n";
     std::cin >> a >> b;
@@ -39,21 +41,16 @@ int main()
     // x_j возрастает, можно не сортировать.
     for (int j = 0; j < m; j++)
     {
-
         interpol_table[j].first = a + j * (b - a) / (m - 1);
         interpol_table[j].second = function(interpol_table[j].first);
     }
-    std::cout << std::endl;
-    for (auto &i : interpol_table)
-    {
-        std::cout << i.first << " ";
-    }
-    std::cout << std::endl;
 
+    std::cout << std::endl;
     for (auto &i : interpol_table)
     {
-        std::cout << i.second << " ";
+        std::cout << i.first << " " << i.second << '\n';
     }
+
     std::cout << std::endl;
     bool stop = false;
     do
@@ -62,15 +59,24 @@ int main()
         std::cin >> n;
         while (n > m - 1)
         {
-            std::cout << "n не должно превосходить m!!!!\n Введите значение n повторно:";
+            std::cout << "n не должно превосходить m = " << m - 1 << "!!!!\n Введите значение n повторно:";
             std::cin >> n;
         }
         std::cout << "Введите точку интерполирования:\n";
         std::cin >> x;
 
+        auto cmp = [&x](std::pair<long double, long double> l, std::pair<long double, long double> r)
+        {
+            return std::fabs(l.first - x) < std::fabs(r.first - x);
+        };
+        std::sort(interpol_table.begin(), interpol_table.end(), cmp);
+
         long double approximate = lagrange_interpol(interpol_table, n, x);
+        std::cout.precision(16);
         std::cout << "Полученное значение: " << approximate << std::endl;
+        std::cout.precision(16);
         std::cout << "Ожидаемое значение: " << function(x) << std::endl;
+        std::cout.precision(16);
         std::cout << "Отклонение: " << std::fabs(function(x) - approximate) << std::endl;
 
         std::cout << "Ввести новый значения x и n?\n";
