@@ -163,7 +163,7 @@ def calculate_runge(func):
             f"{j_h_2:.10f}",
              f"{abs(func.f_diff(x_i) - j_h_2):.10f}",
             f"{j:.10f}",
-            f"{abs(func.f_diff(x_i) - j):10f}",
+            f"{abs(func.f_diff(x_i) - j):.10f}",
             f"{j_h_d2:.10f}",
             f"{j_h_2_d2:.10f}",
             f"{abs(func.f_2diff(x_i) - j_d2)}"
