@@ -3,17 +3,8 @@ import math
 from tabulate import tabulate
 from scipy.integrate import quad
 
-"""1. знать, что такое Алгебраическая Степень Точности КФ (АСТ), оценку для
-АСТ ИКФ;
-2. знать формулировку теоремы (критерий ИКФ);
-3. знать алгоритм построения ИКФ."""
-
 
 def exact_integral(a, b):
-    """
-    Вычисление точного значения интеграла: ∫ e^(-x) * sin(x) dx на [a, b].
-    Используем первообразную: F(x) = -0.5 * e^(-x) * (sin(x) + cos(x)).
-    """
     def F(x):
         return -0.5 * math.exp(-x) * (math.sin(x) + math.cos(x))
     return F(b) - F(a)
@@ -47,7 +38,6 @@ def calculate_ikf_integral(f_values, coefficients):
 
 def check_accuracy(coefficients, nodes, N, a, b):
     for degree in range(1, N):  # Проверяем для многочленов степени 1, 2, ..., N-1
-        # Создаем многочлен степени degree
         def poly(x, degree=degree):
             return x ** degree
 
@@ -82,10 +72,18 @@ def main():
     print("Введите узлы (через пробел):")
     
     nodes = list(map(float, input().split()))
-    while len(set(nodes)) != N:
-        print(f"Узлы должны быть попарно различны и их должно быть {N}")
+    def check_in(nodes):
+        check = False
+        for i in nodes:
+            check = check or (i < a or i > b)
+        return check
+    check = check_in(nodes)
+    
+    while len(set(nodes)) != N or check:
+        print(f"Узлы должны быть попарно различны, лежать в [{a},{b}] и их должно быть {N}")
         print(f"Введите {N} узлов (через пробел):")
         nodes = list(map(float, input().split()))
+        check = check_in(nodes)
 
     # Шаг 3: Вычисление моментов весовой функции
     moments = weight_moments(a, b, N - 1)
@@ -106,7 +104,7 @@ def main():
     ikf_value = calculate_ikf_integral(f_values, coefficients)
     print(f"Значение интеграла с помощью ИКФ: {ikf_value:.12f}")
     print(f"Точное значение: {exact_value:.12f}")
-    print(f"Разница между точным и ИКФ: {abs(exact_value - ikf_value):.12e}")
+    print(f"Разница между точным и ИКФ: {abs(exact_value - ikf_value):.12f}")
 
 if __name__ == "__main__":
     main()
