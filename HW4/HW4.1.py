@@ -3,6 +3,8 @@ import math
 from tabulate import tabulate
 from scipy.integrate import quad
 
+def f(x):
+    return math.sin(x)
 
 def exact_integral(a, b):
     def F(x):
@@ -60,7 +62,6 @@ def main():
     print("Задача 4.1: Приближённое вычисление интегралов при помощи интерполяционных квадратурных формул (ИКФ)")
     print("Вариант 13: f(x) = sin(x), rho(x)=e^(-x)")
     print("Введите границы интегрирования")
-    
     a,b = map(float, input().split())
     
     print(f"Отрезок интегрирования: [{a}, {b}]")
@@ -89,22 +90,23 @@ def main():
     moments = weight_moments(a, b, N - 1)
     print("\nМоменты весовой функции:")
     for i, moment in enumerate(moments):
-        print(f"Момент μ_{i} = {moment:.12f}")
+        print(f"Момент μ_{i} =  ∫ₐᵇ x^{i} * e^(-x) dx = {moment:.12f}")
 
     # Шаг 4: Решение СЛАУ для коэффициентов
     coefficients = solve_coefficients(nodes, moments)
     print("\nТаблица узлов и коэффициентов:")
     table = [[f"x_{i+1}", nodes[i], coefficients[i]] for i in range(N)]
     print(tabulate(table, headers=["Узел", "Значение узла", "Коэффициент"], floatfmt=".12f"))
-
+    print("Сумма коэффициентов:",sum(coefficients))
+    print()
     print("Проверка точности:")
     check_accuracy(coefficients, nodes, N, a, b)
     print("Результат решения:")
-    f_values = [math.sin(node) for node in nodes]
+    f_values = [f(node) for node in nodes]
     ikf_value = calculate_ikf_integral(f_values, coefficients)
     print(f"Значение интеграла с помощью ИКФ: {ikf_value:.12f}")
     print(f"Точное значение: {exact_value:.12f}")
-    print(f"Разница между точным и ИКФ: {abs(exact_value - ikf_value):.12f}")
+    print(f"Разница между точным и ИКФ: {abs(exact_value - ikf_value):.12e}")
 
 if __name__ == "__main__":
     main()
