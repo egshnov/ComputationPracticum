@@ -1,18 +1,20 @@
 import numpy as np
 import math
-# Определение функции
+
+def constant_function(x,c):
+    return c * np.ones_like(x)
+
 def f(x):
-    return x**8 + x**7 + x**6 + 10
-    #return np.exp(x)**2
-    #return np.exp(x**2)  # Пример
+    return constant_function(x,10)
+
 
 def rho(x):
-    return 1
+    return 1 #np.exp(x)
 
 def F(x):
     return rho(x) * f(x)
 
-# Точное значение интеграла
+
 def exact_integral(f, a, b):
     from scipy.integrate import quad
     result, _ = quad(f, a, b)
@@ -22,20 +24,15 @@ def composite_quadratures(f, a, b, m):
     h = (b - a) / m
     x = np.linspace(a, b, m + 1) # равномерно распределенная последовательность числе в отрезке с указанным шагом
     
-    # Левые прямоугольники
-    left_rect = sum(f(x[:-1])) * h
+    left_rect = sum(f(x[:-1])) * h # все кроме последнего
     
-    # Правые прямоугольники
-    right_rect = sum(f(x[1:])) * h
+    right_rect = sum(f(x[1:])) * h # все кроме первого
     
-    # Средние прямоугольники
     mid_points = (x[:-1] + x[1:]) / 2
     mid_rect = sum(f(mid_points)) * h
     
-    # Трапеции
     trapezoid = (f(a) + f(b) + 2 * sum(f(x[1:-1]))) * h / 2
     
-    # Симпсона
     # Всегда используем чётное количество отрезков
     m_simpson = 2 * m
     h_simpson = (b - a) / m_simpson
@@ -47,13 +44,8 @@ def composite_quadratures(f, a, b, m):
     return left_rect, right_rect, mid_rect, trapezoid, simpson
 
 def runge_correction_pair(j_h, j_h2, p):
-    """
-    Уточнение значения J(h) с использованием J(h/2).
-    """
     return j_h2 + (j_h2 - j_h) / (2**p - 1)
-        #return (2**p * j_h2 - j_h) / (2**p - 1)
-        #return j_h + (j_h - j_h2) / (2**p - 1)
-    return None
+
 
 def main():
     from tabulate import tabulate
@@ -63,13 +55,11 @@ def main():
     b = float(input("Введите верхний предел интегрирования B: "))
     m = int(input("Введите число промежутков деления m: "))
     
-    # Точное значение
     j_exact = exact_integral(F, a, b)
     h = (b - a) / m
     print(f"\nТочное значение интеграла: J = {j_exact:.15f}")
     print(f"Параметры задачи: A={a}, B={b}, m={m}, h={h:.15f}\n")
     
-    # Приближённое вычисление
     j_approx = composite_quadratures(F, a, b, m)
     j_approx_h2 = composite_quadratures(F, a, b, m * 2)
     
@@ -77,7 +67,6 @@ def main():
                "Средние прямоугольники", "Трапеции", "Симпсона"]
     orders = [1, 1, 2, 2, 4]
 
-    # Таблица результатов без уточнения
     table = []
     for method, j in zip(methods, j_approx):
         abs_error = abs(j_exact - j)
