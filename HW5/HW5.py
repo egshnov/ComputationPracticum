@@ -10,33 +10,20 @@ def exact_solution(x):
 # Функция, определяющая правую часть уравнения
 def f(x, y):
     return -y + 2 * y**2 + 1
+#x0, y0 = 0, 0.25
+
+def derivative(i):
+    arr = [0.25, 0.875, -0.4375, 0.984375, -2.7890625, -3.7734375]
+    return arr[i]
 
 def taylor_method(x0, y0, h, N):
-    def derivatives(y):
-        d1 = -y + 2 * y**2 + 1                           # y'(x)
-        d2 = -d1 + 4 * y * d1                            # y''(x)
-        d3 = -d2 + 4 * (d1**2 + y * d2)                  # y^{(3)}(x)
-        d4 = -d3 + 4 * (3 * d1 * d2 + y * d3)            # y^{(4)}(x)
-        d5 = -d4 + 4 * (3 * d2**2 + 4 * d1 * d3 + y * d4)# y^{(5)}(x)
-        return [d1, d2, d3, d4, d5]
-
     x_vals = [x0 + k * h for k in range(-2, N + 1)] 
-    y_vals = [None] * len(x_vals)  
+    y_vals = [0] * len(x_vals)  
     y_vals[2] = y0 
-
-    for k in range(-1, -3, -1):  # k = -1, -2
-        x_k = x0 + k * h
-        y_k_plus_1 = y_vals[k + 3]  # y_{k+1}
-        d = derivatives(y_k_plus_1)
-        y_vals[k + 2] = y_k_plus_1 - sum(d[i] * (h**(i + 1)) / factorial(i + 1) for i in range(5))
-
-    #k = 1, 2, ..., N
-    for k in range(1, N + 1):
-        x_k = x0 + k * h
-        y_k_minus_1 = y_vals[k + 1]  # y_{k-1}
-        d = derivatives(y_k_minus_1)
-        y_vals[k + 2] = y_k_minus_1 + sum(d[i] * (h**(i + 1)) / factorial(i + 1) for i in range(5))
-
+    for k in range(-2, N+1):
+         x_k = x0 + k * h
+         y_vals[k+2] = sum(derivative(i) * ((x_k - x0)**(i)) / factorial(i) for i in range(6))
+         
     return x_vals, y_vals
 
 # Метод Рунге-Кутты 4-го порядка
@@ -95,27 +82,12 @@ def euler_method_2(x0, y0, h, N):
 
 def adams_4th_order(x0, y0, h, N):
     # Получаем начальные значения из метода Тейлора
-    x_taylor, y_taylor = taylor_method(x0, y0, h, 5)
+    x, y = taylor_method(x0, y0, h, N)
 
-    y_taylor[2] = y0
-
-    # Инициализация массивов для метода Адамса
-    x_vals = x_taylor[:5]
-    y_vals = y_taylor[:5]
-
-    for i in range(3, N + 1):
-        f_3 = f(x_vals[-4], y_vals[-4])
-        f_2 = f(x_vals[-3], y_vals[-3])
-        f_1 = f(x_vals[-2], y_vals[-2])
-        f_0 = f(x_vals[-1], y_vals[-1])
-
-        y_next = y_vals[-1] + h * (55 / 24 * f_0 - 59 / 24 * f_1 + 37 / 24 * f_2 - 9 / 24 * f_3)
-        x_next = x_vals[-1] + h
-
-        x_vals.append(x_next)
-        y_vals.append(y_next)
-
-    return x_vals, y_vals
+    for i in range(3, len(y)-1):
+        y[i+1] = y[i] + h/24 * (55 * f(x[i], y[i]) - 59 * f(x[i-1], y[i-1]) + 37 * f(x[i-2], y[i-2]) - 9 * f(x[i-3], y[i-3]))
+        #print(y[i+1])
+    return x, y
 
 
 
@@ -144,21 +116,13 @@ def main():
             adjust_table(y_euler,max_len)
             adjust_table(y_euler1,max_len)
             adjust_table(y_euler2,max_len)
-            #adjust_table(y_adams,max_len)
-            #y_taylor = y_taylor[:min_len]
-            #y_rk4 = y_rk4[:min_len]
-            # y_euler = y_euler[:min_len]
-            # y_euler1 = y_euler1[:min_len]
-            # y_euler2 = y_euler2[:min_len]
-            # y_adams = y_adams[:min_len]
-            # x_t = x_t[:min_len]
 
             table_data = []
             for i in range(max_len):
                 exact = exact_solution(x_t[i])
                 table_data.append([
                     i-2, x_t[i], exact,
-                    y_taylor[i], abs(exact-y_taylor[i]), y_rk4[i], y_euler[i],
+                    y_taylor[i], str(f'{abs(exact-y_taylor[i]):.13f}'), y_rk4[i], y_euler[i],
                     y_euler1[i], y_euler2[i], y_adams[i]
                 ])
 
@@ -167,13 +131,14 @@ def main():
             table_data.append([
                 "Погрешности",
                 None, None,
-                abs(y_taylor[last_idx] - exact), None,
-                abs(y_rk4[last_idx] - exact),
-                abs(y_euler[last_idx] - exact),
-                abs(y_euler1[last_idx] - exact),
-                abs(y_euler2[last_idx] - exact),
-                abs(y_adams[last_idx] - exact)
+                str(f'{abs(y_taylor[last_idx] - exact):.13f}'), None,
+                str(f'{abs(y_rk4[last_idx] - exact):.13f}'),
+                str(f'{abs(y_euler[last_idx] - exact):.13f}'),
+                str(f'{abs(y_euler1[last_idx] - exact):.13f}'),
+                str(f'{abs(y_euler2[last_idx] - exact):.13f}'),
+                str(f'{abs(y_adams[last_idx] - exact):.13f}')
             ])
+            
 
             headers = [
                 "Шаг", "x", "Точное",
@@ -181,7 +146,7 @@ def main():
             ]
 
             print("\nТаблица решений:")
-            print(tabulate(table_data, headers=headers, floatfmt=".6f", tablefmt="grid"))
+            print(tabulate(table_data, headers=headers, floatfmt=".11f", tablefmt="grid"))
 
             choice = input("\nВыберите действие:\n1. Ввести новые параметры N и h.\n2. Завершить программу.\nВаш выбор: ")
             if choice == "1":
